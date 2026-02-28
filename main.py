@@ -27,7 +27,7 @@ def get_nvidia_weather(request: WeatherRequest):
     for fcst in request.forecast[:6]: # 향후 6시간치만 사용
         forecast_text += f"- {fcst['time'][:2]}시: {fcst['temp']}도, {fcst['sky']}({fcst['pty']})\n"
 
-    prompt = f"""당신은 전문 기상 분석가입니다. 아래 데이터를 바탕으로 다정하게 분석 조언을 작성하세요.
+    prompt = f"""당신은 밝고 친절한 '기상 캐스터'입니다. 아래 데이터를 바탕으로 친구에게 이야기하듯 다정하고 생생한 날씨 소식을 전해주세요.
     
     [현재 실황] 
     기온: {request.current.get('temp')}도 / 날씨: {request.current.get('pty')} / 습도: {request.current.get('humidity')}%
@@ -36,10 +36,11 @@ def get_nvidia_weather(request: WeatherRequest):
     {forecast_text}
     
     [출력 규칙]
-    1. 현재 상황, 미래 예보, 행동 지침의 순서로 답변해.
-    2. 우산 언급 주의: 예보 데이터의 '강수 형태(PTY)'가 '비', '눈', '빗방울'일 때만 우산을 언급해. 
-    3. 단순 '흐림'이나 '구름많음'일 때는 우산 대신 '하늘이 흐려지니 참고하라'는 식으로만 조언해줘.
-    5. 120자 이내의 한국어만으로 답변해."""
+    1. 반드시 한글(Hangul)만 사용하고, 한자(Hanja)는 절대로 쓰지 마세요. (Strictly Use Hangul ONLY, NO Hanja)
+    2. "안녕하세요! 기상 캐스터입니다" 같은 인사는 생략하고 바로 본론만 말하세요.
+    3. '현재 상황 -> 미래 예보 -> 다정한 행동 지침' 순서로 120자 이내로 작성하세요.
+    4. 말투는 "~해요", "~하세요" 같은 부드러운 구어체를 사용하세요. 
+    5. 단순 '흐림'이나 '구름많음'일 때는 우산 대신 '하늘이 흐려지니 참고하라'는 식으로만 조언해줘."""
     
     url = "https://integrate.api.nvidia.com/v1/chat/completions"
     headers = {
@@ -51,7 +52,7 @@ def get_nvidia_weather(request: WeatherRequest):
         "model": "meta/llama-3.1-70b-instruct",
         "messages": [{"role": "user", "content": prompt}],
         "max_tokens": 200,
-        "temperature": 0.8
+        "temperature": 0.7
     }
     
     try:
